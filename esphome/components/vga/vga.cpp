@@ -20,8 +20,6 @@ void VGA::setup() {
       this->red_p0_, this->red_p1_, this->green_p0_, this->green_p1_, this->blue_p0_, this->blue_p1_, this->hsync_pin_,
       this->vsync_pin_);
 #endif
-
-  // this->set_update_interval(200);
 }
 
 void HOT VGA::draw_absolute_pixel_internal(int x, int y, Color color) {
@@ -33,7 +31,7 @@ int VGA::get_height_internal() { return this->vga_.yres; }
 
 void VGA::update() {
   this->do_update_();
-  vga_.show(true);
+  vga_.show();
 }
 
 void VGA::dump_config() {
