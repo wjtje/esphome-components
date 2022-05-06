@@ -60,6 +60,12 @@ void ScrollingText::draw(display::DisplayBuffer *buff, uint16_t x_offset, uint16
     }
   }
 
+  // Set position to 0 when text is small enough
+  if (text_width <= width) {
+    this->offset_ = 0;
+    this->wait_ = 0;
+  }
+
   int i = 0;
   int x_at = x_start - this->offset_;
   int x_max = x_offset + width;
