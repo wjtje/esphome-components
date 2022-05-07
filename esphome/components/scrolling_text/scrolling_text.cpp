@@ -49,7 +49,7 @@ void ScrollingText::draw(display::DisplayBuffer *buff, uint16_t x_offset, uint16
   } else {
     // Check if we need to update
     if (now - this->previous_update_ > this->scroll_speed_) {
-      this->offset_++;
+      this->offset_ += now - this->previous_update_ / this->scroll_speed_;
       this->previous_update_ = now;
     }
 
