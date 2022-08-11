@@ -1,8 +1,11 @@
 # Bare sensor component
 
-This component can be used to store an integer that can be read by home-assistant or other esphome nodes.
+This sensor is an empty variable that will push the changes made to the internal value to home-assistant. It will default to `0` but the state can be changed true the `sensor.bare.set_value` lambda action.
 
-Example:
+## Example
+
+This is an example use of the sersor, pressing the button will add `1` to the sersor state.
+
 ```yaml
 sensor:
   - platform: bare

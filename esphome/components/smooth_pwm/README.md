@@ -2,7 +2,8 @@
 
 This component can be used to create a smooth PWM output.
 
-Example:
+## Example
+
 ```yaml
 output:
   - platform: smooth_pwm
