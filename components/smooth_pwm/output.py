@@ -20,8 +20,8 @@ CONFIG_SCHEMA = cv.All(
         {
             cv.Required(CONF_ID): cv.declare_id(SmoothPWM),
             cv.Required(CONF_PIN): cv.int_,
-            cv.Optional(CONF_DURATION): cv.int_,
-            cv.Optional(CONF_DEADZONE): cv.int_,
+            cv.Optional(CONF_DURATION, 1000): cv.int_,
+            cv.Optional(CONF_DEADZONE, 0): cv.int_,
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.require_framework_version(

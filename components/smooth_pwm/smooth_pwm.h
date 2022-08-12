@@ -14,25 +14,26 @@ class SmoothPWM : public output::FloatOutput, public Component {
   void loop() override;
   void dump_config() override;
 
-  void set_pin(int pin) { pin_ = pin; }
-  void set_duration(int duration) { duration_ = duration; }
-  void set_deadzone(int deadzone) { deadzone_ = deadzone; }
+  void set_pin(int pin) { this->pin_ = pin; }
+  void set_duration(int duration) { this->duration_ = duration; }
+  void set_deadzone(int deadzone) { this->deadzone_ = deadzone; }
+
+  int get_pin() { return this->pin_; }
+  float get_state() { return this->state_; }
 
   void write_state(float state) override;
-  void write_analog(float state);
+  void force_write(float state);
 
  protected:
-  // This looks crazy, but it reduces to 6x^5 - 15x^4 + 10x^3 which is just a smooth sigmoid-like
-  // transition from 0 to 1 on x = [0, 1]
-  static float smoothed_progress(float x) { return x * x * x * (x * (x * 6.0f - 15.0f) + 10.0f); }
+  void write_analog(float state);
 
-  uint32_t start_millis = 0;
+  uint32_t start_millis_ = 0;
 
-  float prev_state = 0.0f;
-  float target_state = 0.0f;
-  float state = 0.0f;
+  float prev_state_ = 0.0f;
+  float target_state_ = 0.0f;
+  float state_ = 0.0f;
 
-  bool state_changed = false;
+  bool state_changed_ = false;
 
   int pin_;
   int duration_ = 1000;

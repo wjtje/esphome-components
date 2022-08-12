@@ -22,29 +22,43 @@ void SmoothPWM::dump_config() {
 }
 
 void SmoothPWM::loop() {
+  if (!state_changed_)
+    return;
+
   uint32_t now = millis();
 
-  if (state_changed) {
-    float progress = this->smoothed_progress((float) (now - this->start_millis) / (float) (this->duration_));
+  // Caculate the duration of the 'animation', this keeps the time it take to speed up, and slow down always the same
+  float duration = (float) this->duration_ * fabs(this->prev_state_ - this->target_state_);
+  // Caclate the progress with a linear curve
+  float progress = (float) (now - this->start_millis_) / duration;
 
-    if (progress >= 1.0f || this->target_state == this->state) {
-      this->state = this->target_state;
-      this->state_changed = false;
-    } else {
-      this->state = lerp(progress, this->prev_state, this->target_state);
-    }
-
-    write_analog(this->state);
+  if (progress >= 1.0f || this->target_state_ == this->state_) {
+    this->state_ = this->target_state_;
+    this->state_changed_ = false;
+  } else {
+    this->state_ = lerp(progress, this->prev_state_, this->target_state_);
   }
+
+  write_analog(this->state_);
 }
 
 void SmoothPWM::write_state(float state) {
+  if (this->target_state_ == state)
+    return;
+
   ESP_LOGI(TAG, "Setting target state to: %f", state);
 
-  this->target_state = state;
-  this->prev_state = this->state;
-  this->state_changed = true;
-  this->start_millis = millis();
+  this->target_state_ = state;
+  this->prev_state_ = this->state_;
+  this->state_changed_ = true;
+  this->start_millis_ = millis();
+}
+
+void SmoothPWM::force_write(float state) {
+  // Directly write the state to the pwm output
+  this->write_analog(state);
+  this->state_changed_ = false;
+  this->state_ = state;
 }
 
 void SmoothPWM::write_analog(float state) {
