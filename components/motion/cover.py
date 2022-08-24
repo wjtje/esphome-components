@@ -94,17 +94,17 @@ async def to_code(config):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
         await automation.build_automation(trigger, [], conf)
 
-    template_pos_ = await cg.process_lambda(
-        config[CONF_POSITION], [], return_type=cg.optional.template(float)
+    lambda_position_ = await cg.process_lambda(
+        config[CONF_POSITION], [], return_type=cg.float_
     )
-    cg.add(var.set_position(template_pos_))
+    cg.add(var.set_position(lambda_position_))
 
-    template_ope_ = await cg.process_lambda(
-        config[CONF_CAN_OPEN], [], return_type=cg.optional.template(float)
+    lambda_can_open_ = await cg.process_lambda(
+        config[CONF_CAN_OPEN], [], return_type=cg.bool_
     )
-    cg.add(var.set_position(template_ope_))
+    cg.add(var.set_can_open(lambda_can_open_))
 
-    template_clo_ = await cg.process_lambda(
-        config[CONF_CAN_OPEN], [], return_type=cg.optional.template(float)
+    lambda_can_close_ = await cg.process_lambda(
+        config[CONF_CAN_CLOSE], [], return_type=cg.bool_
     )
-    cg.add(var.set_position(template_clo_))
+    cg.add(var.set_can_close(lambda_can_close_))

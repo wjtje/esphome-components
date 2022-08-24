@@ -19,6 +19,7 @@ void MotionCover::loop() {
 
   // Update the position every update interval
   if (now - this->last_publish_time_ > this->update_interval_) {
+    ESP_LOGD(TAG, "New calculated position: %.2f", this->position);
     this->publish_state(false);
     this->last_publish_time_ = now;
   }
@@ -39,11 +40,9 @@ void MotionCover::loop() {
         break;
 
       // Check if the cover can open
-      if (this->can_open_.has_value()) {
-        if (!(*this->can_open_)()) {
-          this->stop_action_.call();
-          break;
-        }
+      if (!this->can_open_()) {
+        this->stop_action_.call();
+        break;
       }
 
       // Check if the cover is fully open or at the target position
@@ -76,11 +75,9 @@ void MotionCover::loop() {
         break;
 
       // Check if the cover can close
-      if (this->can_close_.has_value()) {
-        if (!(*this->can_close_)()) {
-          this->stop_action_.call();
-          break;
-        }
+      if (!this->can_close_()) {
+        this->stop_action_.call();
+        break;
       }
 
       // Check if the cover is fully closed or at the target position
@@ -153,20 +150,15 @@ void MotionCover::control(const cover::CoverCall &call) {
 }
 
 float MotionCover::calculate_position_() {
-  if (!this->position_.has_value())
-    return 0.5f;
+  auto val = this->position_();
 
-  auto val = (*this->position_)();
-  if (!val.has_value())
-    return 0.5f;
-
-  if (*val < 0.0f) {
+  if (val < 0.0f) {
     return 0.0f;
-  } else if (*val > 1.0f) {
+  } else if (val > 1.0f) {
     return 1.0f;
   }
 
-  return roundf(*val * 100) / 100;
+  return roundf(val * 100) / 100;
 }
 
 bool MotionCover::movement_check_() {

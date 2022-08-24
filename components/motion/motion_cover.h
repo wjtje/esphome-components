@@ -27,10 +27,10 @@ class MotionCover : public cover::Cover, public Component {
   };
   void set_stop_action(std::function<void()> &&callback) { this->stop_action_.add(std::move(callback)); };
   void set_force_stop_action(std::function<void()> &&callback) { this->force_stop_action_.add(std::move(callback)); };
-  void set_position(std::function<optional<float>()> &&callback) { this->position_ = callback; };
+  void set_position(const std::function<float()> &&lambda) { this->position_ = lambda; };
   void set_almost_closed(float almost_closed) { this->almost_closed_ = almost_closed; };
-  void set_can_open(std::function<optional<bool>()> &&callback) { this->can_open_ = callback; }
-  void set_can_close(std::function<optional<bool>()> &&callback) { this->can_close_ = callback; }
+  void set_can_open(const std::function<bool()> &&lambda) { this->can_open_ = lambda; }
+  void set_can_close(const std::function<bool()> &&lambda) { this->can_close_ = lambda; }
 
  protected:
   // Default esphome function
@@ -55,9 +55,9 @@ class MotionCover : public cover::Cover, public Component {
   CallbackManager<void()> stop_action_{};
   CallbackManager<void()> force_stop_action_{};
 
-  optional<std::function<optional<float>()>> position_;
-  optional<std::function<optional<bool>()>> can_open_;
-  optional<std::function<optional<bool>()>> can_close_;
+  std::function<float()> position_{};
+  std::function<bool()> can_open_{};
+  std::function<bool()> can_close_{};
   float almost_closed_;
   int update_interval_ = 1000;  // 1s
   float target_margin_ = 0.1f;
