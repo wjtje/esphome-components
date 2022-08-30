@@ -4,10 +4,11 @@ These are some components that I wrote for ESPHome that aren't included in the o
 
 ## Components
 
-- [bare](esphome/components/bare)
-- [scrolling_text](esphome/components/scrolling_text)
-- [smooth_pwm](esphome/components/smooth_pwm)
-- [vga](esphome/components/vga)
+- [bare](components/bare)
+- [motion] (components/motion)
+- [scrolling_text](components/scrolling_text)
+- [smooth_pwm](components/smooth_pwm)
+- [vga](components/vga)
 
 ## How to use it
 
