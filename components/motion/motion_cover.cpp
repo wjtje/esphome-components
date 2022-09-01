@@ -82,9 +82,16 @@ void MotionCover::loop() {
 
       // Check if the cover is fully closed or at the target position
       if (this->is_closed_() || (this->target_position_ != 0.0f && this->is_at_target_position_())) {
-        ESP_LOGI(TAG, "Reahed target position");
-        this->current_operation = cover::CoverOperation::COVER_OPERATION_IDLE;
-        this->publish_state(true);
+        if (this->close_time_ = 0) {
+          ESP_LOGI(TAG, "Reached target position");
+          this->close_time_ = now;
+        }
+        if (now - this->close_time > this->extra_close_duration_) {
+          ESP_LOGI(TAG, "Finished extra close time");
+          this->close_time_ = 0;
+          this->current_operation = cover::CoverOperation::COVER_OPERATION_IDLE;
+          this->publish_state(true);
+        }
         break;
       }
 

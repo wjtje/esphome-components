@@ -31,6 +31,7 @@ class MotionCover : public cover::Cover, public Component {
   void set_almost_closed(float almost_closed) { this->almost_closed_ = almost_closed; };
   void set_can_open(const std::function<bool()> &&lambda) { this->can_open_ = lambda; }
   void set_can_close(const std::function<bool()> &&lambda) { this->can_close_ = lambda; }
+  void set_extra_close_duration(int extra_close_duration) { this->extra_close_duration_ = extra_close_duration; }
 
  protected:
   // Default esphome function
@@ -61,10 +62,12 @@ class MotionCover : public cover::Cover, public Component {
   float almost_closed_;
   int update_interval_ = 1000;  // 1s
   float target_margin_ = 0.1f;
+  int extra_close_duration_;
 
   float last_position_;
   uint32_t last_publish_time_;
   uint32_t last_position_time_;
+  uint32_t close_time_ = 0;
   float target_position_;
   MotionCoverAction current_action_{MotionCoverAction::STOPPED};
 };

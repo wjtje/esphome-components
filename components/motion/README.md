@@ -14,6 +14,7 @@ Custom cover component for two outputs with a pot meter.
 - `almost_closed` (**float**): The zone that needs to be seen as almost closed, or almost opened.
 - `can_open` (**Lambda**): This returns wheater the cover can be opened.
 - `can_close` (**Lambda**): This return wheater the cover can be closed.
+- `extra_close_duration` (**number**): How many miliseconds the door should keep closing the door after the position went to 0, this is helpful if your door need be really closed tight.
 
 ## Example
 
@@ -77,4 +78,5 @@ cover:
       return id(output_pwm_in).get_state() != 0.0f;
     can_close: !lambda |-
       return id(output_pwm_out).get_state() != 0.0f;
+    extra_close_duration: 500
 ```

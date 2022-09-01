@@ -17,6 +17,7 @@ CONF_FORCE_STOP_ACTION = "force_stop_action"
 CONF_ALMOST_CLOSED = "almost_closed"
 CONF_CAN_OPEN = "can_open"
 CONF_CAN_CLOSE = "can_close"
+CONF_EXTRA_CLOSE_DURATION = "extra_close_duration"
 
 motion_ns = cg.esphome_ns.namespace("motion")
 MotionCover = motion_ns.class_("MotionCover", cover.Cover, cg.Component)
@@ -59,6 +60,7 @@ CONFIG_SCHEMA = cover.COVER_SCHEMA.extend(
         cv.Required(CONF_ALMOST_CLOSED): cv.float_,
         cv.Required(CONF_CAN_OPEN): cv.returning_lambda,
         cv.Required(CONF_CAN_CLOSE): cv.returning_lambda,
+        cv.Required(CONF_EXTRA_CLOSE_DURATION): cv.int_,
     }
 )
 
@@ -108,3 +110,5 @@ async def to_code(config):
         config[CONF_CAN_CLOSE], [], return_type=cg.bool_
     )
     cg.add(var.set_can_close(lambda_can_close_))
+
+    cg.add(var.set_extra_close_duration(config[CONF_EXTRA_CLOSE_DURATION]))
