@@ -8,7 +8,6 @@ from esphome.const import (
     CONF_OPEN_ACTION,
     CONF_POSITION,
     CONF_STOP_ACTION,
-    CONF_TRIGGER_ID,
 )
 
 CONF_ALMOST_OPEN_ACTION = "almost_open_action"
@@ -22,39 +21,20 @@ CONF_EXTRA_CLOSE_DURATION = "extra_close_duration"
 motion_ns = cg.esphome_ns.namespace("motion")
 MotionCover = motion_ns.class_("MotionCover", cover.Cover, cg.Component)
 
-CoverOpenAction = motion_ns.class_("CoverOpenAction", automation.Trigger.template())
-CoverAlmostOpenAction = motion_ns.class_(
-    "CoverAlmostOpenAction", automation.Trigger.template()
-)
-CoverCloseAction = motion_ns.class_("CoverCloseAction", automation.Trigger.template())
-CoverAlmostCloseAction = motion_ns.class_(
-    "CoverAlmostCloseAction", automation.Trigger.template()
-)
-CoverStopAction = motion_ns.class_("CoverStopAction", automation.Trigger.template())
-CoverForceStopAction = motion_ns.class_(
-    "CoverForceStopAction", automation.Trigger.template()
-)
-
 CONFIG_SCHEMA = cover.COVER_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(MotionCover),
-        cv.Required(CONF_OPEN_ACTION): automation.validate_automation(
-            {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(CoverOpenAction)}
-        ),
+        cv.Required(CONF_OPEN_ACTION): automation.validate_automation(single=True),
         cv.Required(CONF_ALMOST_OPEN_ACTION): automation.validate_automation(
-            {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(CoverAlmostOpenAction)}
+            single=True
         ),
-        cv.Required(CONF_CLOSE_ACTION): automation.validate_automation(
-            {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(CoverCloseAction)}
-        ),
+        cv.Required(CONF_CLOSE_ACTION): automation.validate_automation(single=True),
         cv.Required(CONF_ALMOST_CLOSED_ACTION): automation.validate_automation(
-            {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(CoverAlmostCloseAction)}
+            single=True
         ),
-        cv.Required(CONF_STOP_ACTION): automation.validate_automation(
-            {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(CoverStopAction)}
-        ),
+        cv.Required(CONF_STOP_ACTION): automation.validate_automation(single=True),
         cv.Required(CONF_FORCE_STOP_ACTION): automation.validate_automation(
-            {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(CoverForceStopAction)}
+            single=True
         ),
         cv.Required(CONF_POSITION): cv.returning_lambda,
         cv.Required(CONF_ALMOST_CLOSED): cv.float_,
@@ -70,31 +50,24 @@ async def to_code(config):
     await cg.register_component(var, config)
     await cover.register_cover(var, config)
 
-    cg.add(var.set_almost_closed(config[CONF_ALMOST_CLOSED]))
-
-    for conf in config.get(CONF_OPEN_ACTION, []):
-        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, [], conf)
-
-    for conf in config.get(CONF_ALMOST_OPEN_ACTION, []):
-        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, [], conf)
-
-    for conf in config.get(CONF_CLOSE_ACTION, []):
-        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, [], conf)
-
-    for conf in config.get(CONF_ALMOST_CLOSED_ACTION, []):
-        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, [], conf)
-
-    for conf in config.get(CONF_STOP_ACTION, []):
-        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, [], conf)
-
-    for conf in config.get(CONF_FORCE_STOP_ACTION, []):
-        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, [], conf)
+    await automation.build_automation(
+        var.get_open_trigger(), [], config[CONF_OPEN_ACTION]
+    )
+    await automation.build_automation(
+        var.get_almost_open_trigger(), [], config[CONF_ALMOST_OPEN_ACTION]
+    )
+    await automation.build_automation(
+        var.get_close_trigger(), [], config[CONF_CLOSE_ACTION]
+    )
+    await automation.build_automation(
+        var.get_almost_close_trigger(), [], config[CONF_ALMOST_CLOSED_ACTION]
+    )
+    await automation.build_automation(
+        var.get_stop_trigger(), [], config[CONF_STOP_ACTION]
+    )
+    await automation.build_automation(
+        var.get_force_stop_trigger(), [], config[CONF_FORCE_STOP_ACTION]
+    )
 
     lambda_position_ = await cg.process_lambda(
         config[CONF_POSITION], [], return_type=cg.float_
@@ -111,4 +84,5 @@ async def to_code(config):
     )
     cg.add(var.set_can_close(lambda_can_close_))
 
+    cg.add(var.set_almost_closed(config[CONF_ALMOST_CLOSED]))
     cg.add(var.set_extra_close_duration(config[CONF_EXTRA_CLOSE_DURATION]))

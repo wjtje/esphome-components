@@ -10,7 +10,7 @@ void MotionCover::setup() {
   this->position = this->calculate_position_();
   this->last_position_ = this->position;
   this->publish_state(false);
-  this->stop_action_.call();
+  this->stop_trigger_->trigger();
 }
 
 void MotionCover::loop() {
@@ -28,7 +28,7 @@ void MotionCover::loop() {
     case cover::CoverOperation::COVER_OPERATION_IDLE:
       if (this->current_action_ != MotionCoverAction::STOPPED) {
         ESP_LOGD(TAG, "Stopped cover");
-        this->stop_action_.call();
+        this->stop_trigger_->trigger();
         this->last_position_time_ = 0;
         this->current_action_ = MotionCoverAction::STOPPED;
       }
@@ -41,7 +41,7 @@ void MotionCover::loop() {
 
       // Check if the cover can open
       if (!this->can_open_()) {
-        this->stop_action_.call();
+        this->stop_trigger_->trigger();
         break;
       }
 
@@ -56,7 +56,7 @@ void MotionCover::loop() {
       // Check if the cover is almost fully open
       if (this->is_almost_open_() && this->current_action_ != MotionCoverAction::SLOW_OPENING) {
         ESP_LOGD(TAG, "Almost open, slowing down speed");
-        this->almost_open_action_.call();
+        this->almost_open_trigger_->trigger();
         this->current_action_ = MotionCoverAction::SLOW_OPENING;
         break;
       }
@@ -64,7 +64,7 @@ void MotionCover::loop() {
       // Just normaly opening
       if (this->current_action_ != MotionCoverAction::OPENING) {
         ESP_LOGD(TAG, "Opening");
-        this->open_action_.call();
+        this->open_trigger_->trigger();
         this->current_action_ = MotionCoverAction::OPENING;
       }
       break;
@@ -76,7 +76,7 @@ void MotionCover::loop() {
 
       // Check if the cover can close
       if (!this->can_close_()) {
-        this->stop_action_.call();
+        this->stop_trigger_->trigger();
         break;
       }
 
@@ -86,7 +86,7 @@ void MotionCover::loop() {
           ESP_LOGI(TAG, "Reached target position");
           this->close_time_ = now;
         }
-        if (now - this->close_time > this->extra_close_duration_) {
+        if (now - this->close_time_ > this->extra_close_duration_) {
           ESP_LOGI(TAG, "Finished extra close time");
           this->close_time_ = 0;
           this->current_operation = cover::CoverOperation::COVER_OPERATION_IDLE;
@@ -98,7 +98,7 @@ void MotionCover::loop() {
       // Check if the cover is almost fully closed
       if (this->is_almost_closed_() && this->current_action_ != MotionCoverAction::SLOW_CLOSING) {
         ESP_LOGD(TAG, "Almost closed, slowing down speed");
-        this->almost_closed_action_.call();
+        this->almost_closed_trigger_->trigger();
         this->current_action_ = MotionCoverAction::SLOW_CLOSING;
         break;
       }
@@ -106,7 +106,7 @@ void MotionCover::loop() {
       // Just normally closing
       if (this->current_action_ != MotionCoverAction::CLOSING) {
         ESP_LOGD(TAG, "Closing");
-        this->close_action_.call();
+        this->close_trigger_->trigger();
         this->current_action_ = MotionCoverAction::CLOSING;
       }
       break;
@@ -182,7 +182,7 @@ bool MotionCover::movement_check_() {
     this->current_operation = cover::CoverOperation::COVER_OPERATION_IDLE;
     this->current_action_ = MotionCoverAction::STOPPED;
     this->publish_state(true);
-    this->force_stop_action_.call();
+    this->force_stop_trigger_->trigger();
     return false;
   }
 
