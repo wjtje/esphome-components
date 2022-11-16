@@ -29,6 +29,8 @@ class VGA : public PollingComponent, public display::DisplayBuffer {
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::PROCESSOR; }
 
+  display::DisplayType get_display_type() override { return display::DisplayType::DISPLAY_TYPE_COLOR; }
+
  protected:
   void draw_absolute_pixel_internal(int x, int y, Color color) override;
   int get_width_internal() override;
