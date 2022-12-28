@@ -22,7 +22,7 @@ class MotionCover : public cover::Cover, public Component {
   Trigger<> *get_almost_open_trigger() const { return this->almost_open_trigger_; }
   Trigger<> *get_close_trigger() const { return this->close_trigger_; }
   Trigger<> *get_almost_closed_trigger() const { return this->almost_closed_trigger_; }
-  Trigger<> *get_stpp_trigger() const { return this->stop_trigger_; }
+  Trigger<> *get_stop_trigger() const { return this->stop_trigger_; }
   Trigger<> *get_force_stop_trigger() const { return this->force_stop_trigger_; }
 
   void set_position(const std::function<float()> &&lambda) { this->position_ = lambda; };

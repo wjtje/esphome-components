@@ -60,7 +60,7 @@ async def to_code(config):
         var.get_close_trigger(), [], config[CONF_CLOSE_ACTION]
     )
     await automation.build_automation(
-        var.get_almost_close_trigger(), [], config[CONF_ALMOST_CLOSED_ACTION]
+        var.get_almost_closed_trigger(), [], config[CONF_ALMOST_CLOSED_ACTION]
     )
     await automation.build_automation(
         var.get_stop_trigger(), [], config[CONF_STOP_ACTION]
