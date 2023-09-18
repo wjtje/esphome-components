@@ -25,8 +25,10 @@ class MotionCover : public cover::Cover, public Component {
   Trigger<> *get_stop_trigger() const { return this->stop_trigger_; }
   Trigger<> *get_force_stop_trigger() const { return this->force_stop_trigger_; }
 
+  void set_almost_at_target(float almost_at_target) { this->almost_at_target_ = almost_at_target; };
+  void set_target_margin(float target_margin) { this->target_margin_ = target_margin; };
+
   void set_position(const std::function<float()> &&lambda) { this->position_ = lambda; };
-  void set_almost_closed(float almost_closed) { this->almost_closed_ = almost_closed; };
   void set_can_open(const std::function<bool()> &&lambda) { this->can_open_ = lambda; }
   void set_can_close(const std::function<bool()> &&lambda) { this->can_close_ = lambda; }
   void set_extra_close_duration(int extra_close_duration) { this->extra_close_duration_ = extra_close_duration; }
@@ -36,15 +38,21 @@ class MotionCover : public cover::Cover, public Component {
   void control(const cover::CoverCall &call) override;
 
   // Helper function
-  bool is_open_() { return this->position >= 1.0f; }
-  bool is_almost_open_() { return this->position >= 1.0f - this->almost_closed_; }
-  bool is_closed_() { return this->position <= 0.0f; }
-  bool is_almost_closed_() { return this->position <= this->almost_closed_; }
+  bool at_position_(float offset) {
+    if (this->current_operation == cover::COVER_OPERATION_OPENING) {
+      if (this->target_position_ == 1.0f)
+        return this->position >= 1.0f;
+      return this->position > this->target_position_ - offset;
+    }
+
+    if (this->target_position_ == 0.0f)
+      return this->position <= 0.0f;
+    return this->position < this->target_position_ + offset;
+  }
 
   float calculate_position_();
 
   bool movement_check_();
-  bool is_at_target_position_();
 
   // Callback managers
   Trigger<> *open_trigger_{new Trigger<>()};
@@ -57,9 +65,11 @@ class MotionCover : public cover::Cover, public Component {
   std::function<float()> position_{};
   std::function<bool()> can_open_{};
   std::function<bool()> can_close_{};
-  float almost_closed_;
-  int update_interval_ = 1000;  // 1s
-  float target_margin_ = 0.1f;
+
+  float almost_at_target_ = 0.1f;
+  float target_margin_ = 0.05f;
+
+  int update_interval_ = 500;  // 1s
   int extra_close_duration_;
 
   float last_position_;

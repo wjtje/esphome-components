@@ -13,10 +13,11 @@ from esphome.const import (
 CONF_ALMOST_OPEN_ACTION = "almost_open_action"
 CONF_ALMOST_CLOSED_ACTION = "almost_closed_action"
 CONF_FORCE_STOP_ACTION = "force_stop_action"
-CONF_ALMOST_CLOSED = "almost_closed"
+CONF_ALMOST_AT_TARGET = "almost_at_target"
 CONF_CAN_OPEN = "can_open"
 CONF_CAN_CLOSE = "can_close"
 CONF_EXTRA_CLOSE_DURATION = "extra_close_duration"
+CONF_TARGET_MARGIN = "target_margin"
 
 motion_ns = cg.esphome_ns.namespace("motion")
 MotionCover = motion_ns.class_("MotionCover", cover.Cover, cg.Component)
@@ -37,7 +38,8 @@ CONFIG_SCHEMA = cover.COVER_SCHEMA.extend(
             single=True
         ),
         cv.Required(CONF_POSITION): cv.returning_lambda,
-        cv.Required(CONF_ALMOST_CLOSED): cv.float_,
+        cv.Optional(CONF_ALMOST_AT_TARGET, 0.1): cv.float_,
+        cv.Optional(CONF_TARGET_MARGIN, 0.02): cv.float_,
         cv.Required(CONF_CAN_OPEN): cv.returning_lambda,
         cv.Required(CONF_CAN_CLOSE): cv.returning_lambda,
         cv.Required(CONF_EXTRA_CLOSE_DURATION): cv.int_,
@@ -84,5 +86,6 @@ async def to_code(config):
     )
     cg.add(var.set_can_close(lambda_can_close_))
 
-    cg.add(var.set_almost_closed(config[CONF_ALMOST_CLOSED]))
+    cg.add(var.set_almost_at_target(config[CONF_ALMOST_AT_TARGET]))
+    cg.add(var.set_target_margin(config[CONF_TARGET_MARGIN]))
     cg.add(var.set_extra_close_duration(config[CONF_EXTRA_CLOSE_DURATION]))

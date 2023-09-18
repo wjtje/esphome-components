@@ -11,7 +11,6 @@ Custom cover component for two outputs with a pot meter.
 - `stop_action` (**Template**): This action is performed when the cover needs to stop.
 - `force_stop_action` (**Template**): This action is performed when the cover needs to stop immediately.
 - `position` (**Lambda**): This returns the current position of the pod meter, 0 closed, 1 opened.
-- `almost_closed` (**float**): The zone that needs to be seen as almost closed, or almost opened.
 - `can_open` (**Lambda**): This returns wheater the cover can be opened.
 - `can_close` (**Lambda**): This return wheater the cover can be closed.
 - `extra_close_duration` (**number**): How many miliseconds the door should keep closing the door after the position went to 0, this is helpful if your door need be really closed tight.
@@ -73,7 +72,6 @@ cover:
           id(output_pwm_in).force_write(0.0f);
     position: !lambda |-
       return id(rotation).get_state();
-    almost_closed: 0.2
     can_open: !lambda |-
       return id(output_pwm_in).get_state() != 0.0f;
     can_close: !lambda |-
