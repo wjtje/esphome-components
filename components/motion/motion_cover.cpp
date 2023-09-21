@@ -19,9 +19,12 @@ void MotionCover::loop() {
 
   // Update the position every update interval
   if (now - this->last_publish_time_ > this->update_interval_) {
-    ESP_LOGD(TAG, "New calculated position: %.2f", this->position);
-    this->publish_state(false);
     this->last_publish_time_ = now;
+    if (this->last_published_position_ != this->position) {
+      this->last_published_position_ = this->position;
+      ESP_LOGD(TAG, "New calculated position: %.2f", this->position);
+      this->publish_state(false);
+    }
   }
 
   if (this->current_operation == cover::COVER_OPERATION_IDLE) {
@@ -89,10 +92,8 @@ float MotionCover::get_setup_priority() const { return setup_priority::DATA; }
 
 cover::CoverTraits MotionCover::get_traits() {
   auto traits = cover::CoverTraits();
-  traits.set_is_assumed_state(false);
   traits.set_supports_position(true);
-  traits.set_supports_tilt(false);
-  traits.set_supports_toggle(false);
+  traits.set_supports_stop(true);
   return traits;
 }
 

@@ -72,7 +72,7 @@ class MotionCover : public cover::Cover, public Component {
   int update_interval_ = 500;  // 1s
   int extra_close_duration_;
 
-  float last_position_;
+  float last_position_, last_published_position_;
   uint32_t last_publish_time_;
   uint32_t last_position_time_;
   uint32_t close_time_ = 0;
