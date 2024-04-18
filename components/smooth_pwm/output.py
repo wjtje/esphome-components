@@ -8,9 +8,9 @@ from esphome.const import (
 )
 
 CONF_DEADZONE = "deadzone"
+CONF_PAIR_OUTPUT = "pair_output"
 
 DEPENDENCIES = ["esp8266"]
-
 
 smooth_pwm_ns = cg.esphome_ns.namespace("smooth_pwm")
 SmoothPWM = smooth_pwm_ns.class_("SmoothPWM", output.FloatOutput, cg.Component)
@@ -22,6 +22,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Required(CONF_PIN): cv.int_,
             cv.Optional(CONF_DURATION, 1000): cv.int_,
             cv.Optional(CONF_DEADZONE, 0): cv.int_,
+            cv.Optional(CONF_PAIR_OUTPUT): cv.use_id(SmoothPWM)
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.require_framework_version(
@@ -38,3 +39,7 @@ async def to_code(config):
     cg.add(var.set_pin(config[CONF_PIN]))
     cg.add(var.set_duration(config[CONF_DURATION]))
     cg.add(var.set_deadzone(config[CONF_DEADZONE]))
+
+    if CONF_PAIR_OUTPUT in config:
+        out = await cg.get_variable(config[CONF_PAIR_OUTPUT])
+        cg.add(var.set_pair_output(out))

@@ -9,7 +9,6 @@ namespace smooth_pwm {
 static const char *const TAG = "smooth_PWM";
 
 void SmoothPWM::setup() {
-  ESP_LOGI(TAG, "Setting up Smooth PWM");
   this->turn_off();
   pinMode(this->pin_, OUTPUT);
 }
@@ -27,9 +26,9 @@ void SmoothPWM::loop() {
 
   uint32_t now = millis();
 
-  // Caculate the duration of the 'animation', this keeps the time it take to speed up, and slow down always the same
+  // Calculate the duration of the 'animation', this keeps the time it take to speed up, and slow down always the same
   float duration = (float) this->duration_ * fabs(this->prev_state_ - this->target_state_);
-  // Caclate the progress with a linear curve
+  // Calculate the progress with a linear curve
   float progress = (float) (now - this->start_millis_) / duration;
 
   if (progress >= 1.0f || this->target_state_ == this->state_) {
@@ -46,7 +45,7 @@ void SmoothPWM::write_state(float state) {
   if (this->target_state_ == state)
     return;
 
-  ESP_LOGI(TAG, "Setting target state to: %f", state);
+  ESP_LOGD(TAG, "Setting target state to: %f", state);
 
   this->target_state_ = state;
   this->prev_state_ = this->state_;
@@ -67,8 +66,17 @@ void SmoothPWM::write_analog(float state) {
   if (state == 0.0f) {
     pwm = 0;
   }
+
+  if (pwm != 0 && this->pair_output_.has_value()) {
+    if (this->pair_output_.value()->get_state() != 0.0f) {
+      ESP_LOGI(TAG, "Pair output not zero, force write to 0");
+      this->pair_output_.value()->force_write(0.0f);
+    }
+  }
+
   ESP_LOGV(TAG, "Setting state to: %i", pwm);
   analogWrite(this->pin_, pwm);
 }
+
 }  // namespace smooth_pwm
 }  // namespace esphome
