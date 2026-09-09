@@ -35,7 +35,7 @@ void SmoothPWM::loop() {
     this->state_ = this->target_state_;
     this->state_changed_ = false;
   } else {
-    this->state_ = lerp(progress, this->prev_state_, this->target_state_);
+    this->state_ = std::lerp(this->prev_state_, this->target_state_, progress);
   }
 
   write_analog(this->state_);
