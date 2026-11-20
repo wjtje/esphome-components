@@ -17,7 +17,7 @@ These are some components that I wrote for ESPHome that aren't included in the o
 external_components:
   - source:
       type: git
-      url: https://github.com/wjtje/External-Components-for-ESPHome
+      url: https://github.com/wjtje/esphome-components
       ref: main
 ```
 
@@ -25,4 +25,4 @@ external_components:
 
 MIT License
 
-Copyright (c) 2021 Wouter van der Wal
+Copyright (c) 2026 Wouter
