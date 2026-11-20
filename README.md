@@ -6,6 +6,7 @@ These are some components that I wrote for ESPHome that aren't included in the o
 
 - [bare](components/bare)
 - [motion](components/motion)
+- [kortlinje](components/kortlinje)
 - [scrolling_text](components/scrolling_text)
 - [smooth_pwm](components/smooth_pwm)
 - [vga](components/vga)
